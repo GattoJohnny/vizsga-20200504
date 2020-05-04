@@ -1,0 +1,44 @@
+pipeline {
+    agent {label 'worker1'}
+    stages {
+        stage('1 - Install epel-release, then nodejs') {
+            steps {
+                sh 'sudo yum -y install epel-release'
+                sh 'sudo yum install -y gcc make'
+                sh 'curl -Lk https://rpm.nodesource.com/setup_10.x | sudo bash -'
+                sh 'sudo yum -y install nodejs'
+            }
+        }
+
+        stage('2 - Download code from this repository') {
+            steps {
+                sh 'cd /home/jenkins/munka/workspace/japán-karatekutya'
+                sh 'rm -f index.js'
+                sh 'curl -LJO https://raw.githubusercontent.com/tothti/jenkins/master/index.js'
+            }
+        }
+
+        stage('3 - copy+create a systemd service') {
+            steps {
+                sh 'cp /home/jenkins/munka/workspace/japán-karatekutya/index.js /tmp'
+                sh 'rm -f index_devops.service'
+                sh 'curl -LJO https://raw.githubusercontent.com/GattoJohnny/vizsga-20200504/master/index_devops.service'
+                sh 'sudo cp /home/jenkins/munka/workspace/japán-karatekutya/index_devops.service /lib/systemd/system'
+                sh 'sudo systemctl start index_devops.service'
+            }
+        }
+
+        stage('4 - open firewall for 8888/tcp') {
+            steps {
+                sh 'sudo firewall-cmd --permanent --add-port=8888/tcp'
+                sh 'sudo firewall-cmd --reload'
+            }
+
+        }
+         stage('5 - test it with curl') {
+            steps {
+                sh 'curl -Lk localhost:8888'
+            }
+        }
+    }
+}

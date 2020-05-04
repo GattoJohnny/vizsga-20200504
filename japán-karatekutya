@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('1 - Install epel-release, then nodejs') {
             steps {
-                sh 'sudo yum -y install epel-release'
+                sh 'sudo yum -y install epel-release git'
                 sh 'sudo yum install -y gcc make'
                 sh 'curl -Lk https://rpm.nodesource.com/setup_10.x | sudo bash -'
                 sh 'sudo yum -y install nodejs'

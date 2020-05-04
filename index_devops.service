@@ -1,0 +1,8 @@
+[Unit]
+Description=Starting web services, index.js by nodejs
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /tmp/index.js
+Restart=on-failure
